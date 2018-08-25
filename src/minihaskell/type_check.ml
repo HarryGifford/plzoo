@@ -116,3 +116,19 @@ and type_of ctx = function
 	     type_error "%s is used as a pair but its type is %s"
                         (Syntax.string_of_expr e)
 			(Syntax.string_of_type ty))
+            
+  | Syntax.Inl e ->
+    Syntax.TPlus (type_of ctx e, type_of ctx e)
+
+  | Syntax.Inr e ->
+    Syntax.TPlus (type_of ctx e, type_of ctx e)
+
+  | Syntax.Case (e, x1, e1, x2, e2) ->
+    (match type_of ctx e with
+     | Syntax.TPlus (tl, tr) ->
+       let ty = type_of ((x1,tl)::ctx) e1 in
+       check ((x2,tr)::ctx) ty e2; ty
+     | ty ->
+       type_error "%s is used as a pair but its type is %s"
+                      (Syntax.string_of_expr e)
+		   (Syntax.string_of_type ty))

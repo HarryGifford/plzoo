@@ -84,7 +84,15 @@ let rec interp env = function
        | VClosure (env', Syntax.Cons (d1, d2)) ->
 	  interp ((x,ref (VClosure(env',d1)))::(y,ref (VClosure(env',d2)))::env) e3
        | _ -> runtime_error "List expected in match")
-
+  | Syntax.Inl _ as e -> VClosure (env, e)
+  | Syntax.Inr _ as e -> VClosure (env, e)
+  | Syntax.Case (e, x1, e1, x2, e2) ->
+    (match interp env e with
+     | VClosure (env', Syntax.Inl el) ->
+      interp ((x1, ref (VClosure (env', el)))::env) e1
+     | VClosure (env', Syntax.Inr er) ->
+      interp ((x2, ref (VClosure (env', er)))::env) e2
+     | _ -> runtime_error "Sum expected in case")
 
 (** [print_result v] prints at most [n] nodes of the value [v]. *)
 let rec print_result n v =
@@ -110,6 +118,8 @@ let rec print_result n v =
 	  print_string " :: " ;
 	  print_result (n-1) (interp env e2)
      | VClosure (_, Syntax.Fun _) -> print_string "<fun>"
+     | VClosure (_, Syntax.Inl _) -> print_string "inl <>"
+     | VClosure (_, Syntax.Inr _) -> print_string "inr <>"
      | _ -> print_string "?"
   ) ;
   flush stdout

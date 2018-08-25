@@ -8,6 +8,7 @@ type htype =
   | TInt (** integer [int] *)
   | TBool (** booleans [bool] *)
   | TTimes of htype * htype  (** Product [s * t] *)
+  | TPlus of htype * htype   (** Either [s | t] *)
   | TArrow of htype * htype  (** Function type *)
   | TList of htype (** Lists [t list] *)
 
@@ -29,6 +30,10 @@ type expr =
   | Pair of expr * expr  (** pair [(e1, e2)] *)
   | Fst of expr          (** first projection [fst e] *)
   | Snd of expr          (** second projection [snd e] *)
+  | Inl of expr          (** first injection [inl e] *)
+  | Inr of expr          (** second injection [inr e] *)
+  | Case of expr * name * expr * name * expr
+      (** Sum decomposition [case e with inl xl -> el | inr xr -> er] *)
   | Rec of name * htype * expr (** recursion [rec x:t is e] *)
   | Nil of htype         (** empty list *)
   | Cons of expr * expr  (** cons list [e1 :: e2] *)
@@ -46,10 +51,11 @@ let string_of_type ty =
   let rec to_str n ty =
     let (m, str) =
       match ty with
-	  TInt -> (4, "int")
-	| TBool -> (4, "bool")
-	| TList ty -> (3, to_str 3 ty ^ " list")
-	| TTimes (ty1, ty2) -> (2, (to_str 2 ty1) ^ " * " ^ (to_str 2 ty2))
+	  TInt -> (5, "int")
+	| TBool -> (5, "bool")
+	| TList ty -> (4, to_str 4 ty ^ " list")
+	| TTimes (ty1, ty2) -> (3, (to_str 3 ty1) ^ " * " ^ (to_str 3 ty2))
+  | TPlus  (ty1, ty2) -> (2, (to_str 2 ty1) ^ " + " ^ (to_str 2 ty2))
 	| TArrow (ty1, ty2) -> (1, (to_str 1 ty1) ^ " -> " ^ (to_str 0 ty2))
     in
       if m > n then str else "(" ^ str ^ ")"
@@ -68,6 +74,8 @@ let string_of_expr e =
 	| Nil ty ->         (10, "[" ^ (string_of_type ty) ^ "]")
 	| Fst e ->           (9, "fst " ^ (to_str 9 e))
 	| Snd e ->           (9, "snd " ^ (to_str 9 e))
+  | Inl e ->           (9, "inl " ^ (to_str 9 e))
+  | Inr e ->           (9, "inr " ^ (to_str 9 e))
 	| Apply (e1, e2) ->  (10, "<app>")
 	    (* (9, (to_str 8 e1) ^ " " ^ (to_str 9 e2)) *)
 	| Times (e1, e2) ->  (8, (to_str 7 e1) ^ " * " ^ (to_str 8 e2))
@@ -80,6 +88,10 @@ let string_of_expr e =
 	| Less (e1, e2) ->   (5, (to_str 5 e1) ^ " < " ^ (to_str 5 e2))
 	| If (e1, e2, e3) -> (4, "if " ^ (to_str 4 e1) ^ " then " ^
 				(to_str 4 e2) ^ " else " ^ (to_str 4 e3))
+  | Case (e, x1, e1, x2, e2) ->
+      (3, "case " ^ (to_str 3 e) ^ " with " ^
+         "inl " ^ x1 ^ " -> " ^ (to_str 3 e1) ^ " | " ^
+         "inr " ^ x2 ^ " -> " ^ (to_str 3 e2))
 	| Match (e1, ty, e2, x, y, e3) ->
 	    (3, "match " ^ (to_str 3 e1) ^ " with " ^
 	       "[" ^ (string_of_type ty) ^ "] -> " ^ (to_str 3 e2) ^ " | " ^
@@ -117,3 +129,9 @@ let rec subst s = function
   | Pair (e1, e2) -> Pair (subst s e1, subst s e2)
   | Fst e -> Fst (subst s e)
   | Snd e -> Snd (subst s e)
+  | Inl e -> Inl (subst s e)
+  | Inr e -> Inr (subst s e)
+  | Case (e, x1, e1, x2, e2) ->
+    let s1 = List.remove_assoc x1 s in
+    let s2 = List.remove_assoc x2 s in
+    Case (subst s e, x1, subst s1 e1, x2, subst s2 e2)

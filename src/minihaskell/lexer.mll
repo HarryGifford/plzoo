@@ -11,11 +11,14 @@ rule token = parse
   | [' ' '\t']      { token lexbuf }
   | ['0'-'9']+      { INT (int_of_string(lexeme lexbuf)) }
   | "bool"          { TBOOL }
+  | "case"          { CASE }
   | "else"          { ELSE }
   | "false"         { FALSE }
   | "fst"           { FST }
   | "fun"           { FUN }
   | "if"            { IF }
+  | "inl"           { INL }
+  | "inr"           { INR }
   | "int"           { TINT }
   | "is"            { IS }
   | "let"           { LET }  
