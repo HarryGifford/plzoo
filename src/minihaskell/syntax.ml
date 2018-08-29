@@ -55,7 +55,7 @@ let string_of_type ty =
 	| TBool -> (5, "bool")
 	| TList ty -> (4, to_str 4 ty ^ " list")
 	| TTimes (ty1, ty2) -> (3, (to_str 3 ty1) ^ " * " ^ (to_str 3 ty2))
-  | TPlus  (ty1, ty2) -> (2, (to_str 2 ty1) ^ " + " ^ (to_str 2 ty2))
+	| TPlus  (ty1, ty2) -> (2, (to_str 2 ty1) ^ " + " ^ (to_str 2 ty2))
 	| TArrow (ty1, ty2) -> (1, (to_str 1 ty1) ^ " -> " ^ (to_str 0 ty2))
     in
       if m > n then str else "(" ^ str ^ ")"
@@ -74,8 +74,8 @@ let string_of_expr e =
 	| Nil ty ->         (10, "[" ^ (string_of_type ty) ^ "]")
 	| Fst e ->           (9, "fst " ^ (to_str 9 e))
 	| Snd e ->           (9, "snd " ^ (to_str 9 e))
-  | Inl (e, ty) ->     (9, "inl " ^ (to_str 9 e))
-  | Inr (ty, e) ->     (9, "inr " ^ (to_str 9 e))
+	| Inl (e, ty) ->     (9, "inl " ^ (to_str 9 e))
+	| Inr (ty, e) ->     (9, "inr " ^ (to_str 9 e))
 	| Apply (e1, e2) ->  (10, "<app>")
 	    (* (9, (to_str 8 e1) ^ " " ^ (to_str 9 e2)) *)
 	| Times (e1, e2) ->  (8, (to_str 7 e1) ^ " * " ^ (to_str 8 e2))
@@ -88,10 +88,10 @@ let string_of_expr e =
 	| Less (e1, e2) ->   (5, (to_str 5 e1) ^ " < " ^ (to_str 5 e2))
 	| If (e1, e2, e3) -> (4, "if " ^ (to_str 4 e1) ^ " then " ^
 				(to_str 4 e2) ^ " else " ^ (to_str 4 e3))
-  | Case (e, x1, e1, x2, e2) ->
-      (3, "case " ^ (to_str 3 e) ^ " with " ^
-         "inl " ^ x1 ^ " -> " ^ (to_str 3 e1) ^ " | " ^
-         "inr " ^ x2 ^ " -> " ^ (to_str 3 e2))
+	| Case (e, x1, e1, x2, e2) ->
+		(3, "case " ^ (to_str 3 e) ^ " with " ^
+			"inl " ^ x1 ^ " -> " ^ (to_str 3 e1) ^ " | " ^
+			"inr " ^ x2 ^ " -> " ^ (to_str 3 e2))
 	| Match (e1, ty, e2, x, y, e3) ->
 	    (3, "match " ^ (to_str 3 e1) ^ " with " ^
 	       "[" ^ (string_of_type ty) ^ "] -> " ^ (to_str 3 e2) ^ " | " ^
