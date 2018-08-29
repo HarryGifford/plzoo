@@ -88,9 +88,9 @@ let rec interp env = function
   | Syntax.Inr _ as e -> VClosure (env, e)
   | Syntax.Case (e, x1, e1, x2, e2) ->
     (match interp env e with
-     | VClosure (env', Syntax.Inl el) ->
+     | VClosure (env', Syntax.Inl (el, _)) ->
       interp ((x1, ref (VClosure (env', el)))::env) e1
-     | VClosure (env', Syntax.Inr er) ->
+     | VClosure (env', Syntax.Inr (_, er)) ->
       interp ((x2, ref (VClosure (env', er)))::env) e2
      | _ -> runtime_error "Sum expected in case")
 

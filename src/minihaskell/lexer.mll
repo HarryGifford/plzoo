@@ -11,7 +11,6 @@ rule token = parse
   | [' ' '\t']      { token lexbuf }
   | ['0'-'9']+      { INT (int_of_string(lexeme lexbuf)) }
   | "bool"          { TBOOL }
-  | "case"          { CASE }
   | "else"          { ELSE }
   | "false"         { FALSE }
   | "fst"           { FST }
@@ -44,6 +43,7 @@ rule token = parse
   | '/'             { DIVIDE }
   | ':'             { COLON }
   | '<'             { LESS }
+  | '>'             { GREATER }
   | '='             { EQUAL }
   | '['             { LBRACK }
   | ']'             { RBRACK }

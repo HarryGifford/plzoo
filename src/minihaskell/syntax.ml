@@ -30,8 +30,8 @@ type expr =
   | Pair of expr * expr  (** pair [(e1, e2)] *)
   | Fst of expr          (** first projection [fst e] *)
   | Snd of expr          (** second projection [snd e] *)
-  | Inl of expr          (** first injection [inl e] *)
-  | Inr of expr          (** second injection [inr e] *)
+  | Inl of expr * htype  (** first injection [inl e] *)
+  | Inr of htype * expr  (** second injection [inr e] *)
   | Case of expr * name * expr * name * expr
       (** Sum decomposition [case e with inl xl -> el | inr xr -> er] *)
   | Rec of name * htype * expr (** recursion [rec x:t is e] *)
@@ -74,8 +74,8 @@ let string_of_expr e =
 	| Nil ty ->         (10, "[" ^ (string_of_type ty) ^ "]")
 	| Fst e ->           (9, "fst " ^ (to_str 9 e))
 	| Snd e ->           (9, "snd " ^ (to_str 9 e))
-  | Inl e ->           (9, "inl " ^ (to_str 9 e))
-  | Inr e ->           (9, "inr " ^ (to_str 9 e))
+  | Inl (e, ty) ->     (9, "inl " ^ (to_str 9 e))
+  | Inr (ty, e) ->     (9, "inr " ^ (to_str 9 e))
 	| Apply (e1, e2) ->  (10, "<app>")
 	    (* (9, (to_str 8 e1) ^ " " ^ (to_str 9 e2)) *)
 	| Times (e1, e2) ->  (8, (to_str 7 e1) ^ " * " ^ (to_str 8 e2))
@@ -129,8 +129,8 @@ let rec subst s = function
   | Pair (e1, e2) -> Pair (subst s e1, subst s e2)
   | Fst e -> Fst (subst s e)
   | Snd e -> Snd (subst s e)
-  | Inl e -> Inl (subst s e)
-  | Inr e -> Inr (subst s e)
+  | Inl (e, ty) -> Inl (subst s e, ty)
+  | Inr (ty, e) -> Inr (ty, subst s e)
   | Case (e, x1, e1, x2, e2) ->
     let s1 = List.remove_assoc x1 s in
     let s2 = List.remove_assoc x2 s in

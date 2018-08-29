@@ -11,7 +11,7 @@
 %token TIMES
 %token DIVIDE
 %token MOD
-%token EQUAL LESS
+%token EQUAL LESS GREATER
 %token IF THEN ELSE
 %token FUN DARROW
 %token COLON
@@ -23,7 +23,6 @@
 %token SND
 %token INL
 %token INR
-%token CASE
 %token LBRACK RBRACK
 %token CONS
 %token MATCH WITH ALTERNATIVE
@@ -83,18 +82,18 @@ expr:
   | IF expr THEN expr ELSE expr	{ If ($2, $4, $6) }
   | FUN VAR COLON ty DARROW expr { Fun ($2, $4, $6) }
   | REC VAR COLON ty IS expr { Rec ($2, $4, $6) }
-  | CASE expr WITH INL VAR DARROW expr ALTERNATIVE INR VAR DARROW expr
+  | MATCH expr WITH INL VAR DARROW expr ALTERNATIVE INR VAR DARROW expr
       { Case ($2, $5, $7, $10, $12) }
   | MATCH expr WITH nil DARROW expr ALTERNATIVE VAR CONS VAR DARROW expr
       { Match ($2, $4, $6, $8, $10, $12) }
 
 app:
-    app non_app         { Apply ($1, $2) }
-  | INL non_app         { Inl $2 }
-  | INR non_app         { Inr $2 }
-  | FST non_app         { Fst $2 }
-  | SND non_app         { Snd $2 }
-  | non_app non_app     { Apply ($1, $2) }
+    app non_app                         { Apply ($1, $2) }
+  | INL non_app LESS ty GREATER         { Inl ($2, $4) }
+  | INR LESS ty GREATER non_app         { Inr ($3, $5) }
+  | FST non_app                         { Fst $2 }
+  | SND non_app                         { Snd $2 }
+  | non_app non_app                     { Apply ($1, $2) }
 
 non_app:
     VAR		        	  { Var $1 }
