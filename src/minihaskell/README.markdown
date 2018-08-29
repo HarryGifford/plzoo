@@ -3,6 +3,7 @@ A lazy functional language with following features:
 * integers with arithmetical operations `*`, `+`, `-`, `/`, `%`
 * booleans with conditional statements and comparison `=`, `<` of integers
 * ordered pairs
+* basic lazy sum type
 * lists
 * functions
 * general recursion (fixpoint operator)
@@ -12,7 +13,9 @@ A lazy functional language with following features:
 The file primes.minhs defines the infinite list of prime numbers. You
 can load it and try it as follows:
 
-    $ ./minihaskell.byte prime.minhs 
+    $ ./minihaskell.byte prime.minhs
+    val fib : int -> int
+    - : int = 55
     val not : bool -> bool
     val div : int -> int -> int
     val mod : int -> int -> int
@@ -24,6 +27,9 @@ can load it and try it as follows:
     val nat2 : int list
     val sieve : int list -> int list
     val primes : int list
+    val fib_opt : int -> int + bool
+    - : int = 55
+    - : int = -1
     MiniHaskell. Press Ctrl-D to exit.
     MiniHaskell> primes
     - : int list = 2 :: 3 :: 5 :: 7 :: 11 :: 13 :: 17 :: 19 :: 23 ::
