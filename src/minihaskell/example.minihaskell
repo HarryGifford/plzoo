@@ -1,4 +1,16 @@
 ------------------------------------------------------------------------
+-- Basic recursion on integers
+------------------------------------------------------------------------
+
+-- Compute the nth fibonacci number.
+let fib = rec fib : int -> int is
+  fun n : int => if n < 2 then n else fib (n-1) + fib (n-2)
+;;
+
+fib 10
+;;
+
+------------------------------------------------------------------------
 -- Basic operations on lists of integers
 ------------------------------------------------------------------------
 
@@ -116,3 +128,21 @@ let primes = sieve nat2
 ;;
 
 primes
+;;
+
+-- Lazy sum type
+
+-- Emulate an option type using inl to carry the result and
+-- inr to signal an error.
+let fib_opt = fun x : int =>
+  if x < 0 then inr <int> false else inl (fib x) <bool>
+;;
+
+match fib_opt 10 with
+   inl x => x
+ | inr err => -1
+;;
+
+match fib_opt (-10) with
+   inl x => x
+ | inr err => -1
